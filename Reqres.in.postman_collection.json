@@ -1,0 +1,324 @@
+{
+  "info": {
+    "_postman_id": "57b75fc5-0f53-4108-9a91-a364ed66b814",
+    "name": "Reqres.in",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58729123",
+    "_collection_link": "https://go.postman.co/collection/58729123-57b75fc5-0f53-4108-9a91-a364ed66b814?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "List User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. Status & performa\r\npm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response time di bawah 2000ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(2000);\r\n});\r\n\r\n// 2. Header\r\npm.test(\"Content-Type adalah JSON\", function () {\r\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r\n});\r\n\r\nconst json = pm.response.json();\r\n\r\n// 3. Struktur body\r\n pm.test(\"Struktur response sesuai\", function () {\r\n    pm.expect(json).to.include.all.keys(\"page\", \"per_page\", \"total\", \"total_pages\", \"data\");\r\n    pm.expect(json.data).to.be.an(\"array\").that.is.not.empty;\r\n});\r\n\r\n \r\n// 4. Logika pagination\r\npm.test(\"Jumlah data sesuai per_page\", function () {\r\n    pm.expect(json.data.length).to.eql(json.per_page);\r\n});\r\n\r\npm.test(\"Pagination konsisten\", function () {\r\n    pm.expect(json.total_pages).to.eql(Math.ceil(json.total / json.per_page));\r\n    pm.expect(json.page).to.eql(1);\r\n});\r\n\r\n// 5. Isi tiap item user\r\npm.test(\"Setiap user punya field wajib dengan tipe yang benar\", function () {\r\n    json.data.forEach(function (user) {\r\n        pm.expect(user).to.have.all.keys(\"id\", \"email\", \"first_name\", \"last_name\", \"avatar\");\r\n        pm.expect(user.id).to.be.a(\"number\").and.to.be.above(0);\r\n        pm.expect(user.email).to.match(/^\\S+@\\S+\\.\\S+$/);\r\n        pm.expect(user.first_name).to.be.a(\"string\").and.to.not.be.empty;\r\n        pm.expect(user.last_name).to.be.a(\"string\").and.to.not.be.empty;\r\n        pm.expect(user.avatar).to.include(\"http\");\r\n    });\r\n});\r\n\r\n\r\n\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://reqres.in/api/users?page=1",
+          "protocol": "https",
+          "host": [
+            "reqres",
+            "in"
+          ],
+          "path": [
+            "api",
+            "users"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "SIngle User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. Status code\r\npm.test(\"Status code is 200\", () => {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// 2. Response time\r\npm.test(\"Response time below 1000ms\", () => {\r\n    pm.expect(pm.response.responseTime).to.be.below(1000);\r\n});\r\n\r\n// 3. Content-Type JSON\r\npm.test(\"Content-Type is JSON\", () => {\r\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r\n});\r\n\r\nconst json = pm.response.json();\r\n\r\n// 4. Struktur response\r\npm.test(\"Has data and support objects\", () => {\r\n    pm.expect(json).to.have.property(\"data\");\r\n    pm.expect(json).to.have.property(\"support\");\r\n});\r\n\r\n// 5. ID sesuai yang di-request\r\npm.test(\"User id is 5\", () => {\r\n    pm.expect(json.data.id).to.eql(5);\r\n});\r\n\r\n// 6. Email ada + format valid\r\npm.test(\"Email is present and valid\", () => {\r\n    pm.expect(json.data.email).to.exist.and.to.not.be.empty;\r\n    pm.expect(json.data.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/);\r\n});\r\n\r\n// 7. Nama depan & belakang\r\npm.test(\"First and last name match\", () => {\r\n    pm.expect(json.data.first_name).to.eql(\"Charles\");\r\n    pm.expect(json.data.last_name).to.eql(\"Morris\");\r\n});\r\n\r\n// 8. Avatar URL valid\r\npm.test(\"Avatar is a valid URL\", () => {\r\n    pm.expect(json.data.avatar).to.match(/^https?:\\/\\/.+/);\r\n});\r\n\r\n// 9. Support info lengkap\r\npm.test(\"Support info is present\", () => {\r\n    pm.expect(json.support.url).to.not.be.empty;\r\n    pm.expect(json.support.text).to.not.be.empty;\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://reqres.in/api/users/5",
+          "protocol": "https",
+          "host": [
+            "reqres",
+            "in"
+          ],
+          "path": [
+            "api",
+            "users",
+            "5"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "User Not Found",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. Status code\r\npm.test(\"Status code is 404\", () => {\r\n    pm.response.to.have.status(404);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://reqres.in/api/users/23",
+          "protocol": "https",
+          "host": [
+            "reqres",
+            "in"
+          ],
+          "path": [
+            "api",
+            "users",
+            "23"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. Status code\r\npm.test(\"Status code is 201\", () => {\r\n    pm.response.to.have.status(201);\r\n});\r\n// 2. Response time\r\npm.test(\"Response time di bawah 2000ms\", () => {\r\n    pm.expect(pm.response.responseTime).to.be.below(2000);\r\n});\r\n\r\nconst json = pm.response.json();\r\nconst requestBody = JSON.parse(pm.request.body.raw);\r\n\r\n// 3. Echo check — response mengembalikan data yang dikirim\r\npm.test(\"Response mengembalikan name & job yang dikirim\", () => {\r\n    pm.expect(json.name).to.eql(requestBody.name);\r\n    pm.expect(json.job).to.eql(requestBody.job);\r\n});\r\n\r\n// 4. ID ter-generate otomatis oleh server\r\npm.test(\"ID ter-generate dan tidak kosong\", () => {\r\n    pm.expect(json.id).to.exist.and.to.not.be.empty;\r\n});\r\n\r\n// 5. createdAt valid\r\npm.test(\"createdAt ada dan format tanggal valid\", () => {\r\n    pm.expect(json.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/);\r\n});\r\n\r\npm.environment.set(\"userId\", json.id);\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"arceus\",\r\n  \"job\": \"leader\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://reqres.in/api/users",
+          "protocol": "https",
+          "host": [
+            "reqres",
+            "in"
+          ],
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update (PUT)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. Status code — PUT returns 200, not 201\r\npm.test(\"Status code is 200\", () => {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// 2. Response time\r\npm.test(\"Response time is below 2000ms\", () => {\r\n    pm.expect(pm.response.responseTime).to.be.below(2000);\r\n});\r\n\r\nconst json = pm.response.json();\r\nconst requestBody = JSON.parse(pm.request.body.raw);\r\n\r\n// 3. Echo check — updated values come back correctly\r\npm.test(\"Response echoes back the updated fields\", () => {\r\n    pm.expect(json.name).to.eql(requestBody.name);\r\n    pm.expect(json.job).to.eql(requestBody.job);\r\n});\r\n\r\n// 4. updatedAt exists, valid, and recent\r\npm.test(\"updatedAt is a valid recent timestamp\", () => {\r\n    pm.expect(json.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/);\r\n    const updatedTime = new Date(json.updatedAt).getTime();\r\n    pm.expect(updatedTime).to.be.above(Date.now() - 5 * 60 * 1000);\r\n});\r\n\r\n// 5. Structure (include, not exact — response has extra support/_meta keys)\r\npm.test(\"Response has expected structure\", () => {\r\n    pm.expect(json).to.include.all.keys(\"name\", \"job\", \"updatedAt\");\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Archeus\",\"job\":\"Robotic\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://reqres.in/api/users/1",
+          "protocol": "https",
+          "host": [
+            "reqres",
+            "in"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update (PATCH)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. Status code\r\npm.test(\"Status code is 200\", () => {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// 2. Response time\r\npm.test(\"Response time is below 2000ms\", () => {\r\n    pm.expect(pm.response.responseTime).to.be.below(2000);\r\n});\r\n\r\nconst json = pm.response.json();\r\nconst requestBody = JSON.parse(pm.request.body.raw);\r\n\r\n// 3. The patched field comes back correctly\r\npm.test(\"Patched field is updated correctly\", () => {\r\n    pm.expect(json.job).to.eql(requestBody.job);\r\n});\r\n\r\n// 4. PATCH-specific: fields you did NOT send must stay untouched\r\npm.test(\"Unpatched fields are not modified\", () => {\r\n    pm.expect(json).to.not.have.property(\"name\");\r\n});\r\n\r\n// 5. updatedAt is valid and recent\r\npm.test(\"updatedAt is a valid recent timestamp\", () => {\r\n    pm.expect(json.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/);\r\n    pm.expect(new Date(json.updatedAt).getTime()).to.be.above(Date.now() - 5 * 60 * 1000);\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"job\":\"Mage\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://reqres.in/api/users/1",
+          "protocol": "https",
+          "host": [
+            "reqres",
+            "in"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. Status code — 204, not 200\r\npm.test(\"Status code is 204\", () => {\r\n    pm.response.to.have.status(204);\r\n});\r\n\r\n// 2. Response time\r\npm.test(\"Response time is below 2000ms\", () => {\r\n    pm.expect(pm.response.responseTime).to.be.below(2000);\r\n});\r\n\r\n// 3. Body must be empty\r\npm.test(\"Response body is empty\", () => {\r\n    pm.expect(pm.response.text()).to.be.empty;\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://reqres.in/api/users/2",
+          "protocol": "https",
+          "host": [
+            "reqres",
+            "in"
+          ],
+          "path": [
+            "api",
+            "users",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delayed List User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. Status code — slow doesn't mean broken\r\npm.test(\"Status code is 200\", () => {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// 2. SLA check — the star of this test\r\npm.test(\"Response time is within SLA (under 5 seconds)\", () => {\r\n    pm.expect(pm.response.responseTime).to.be.below(5000);\r\n});\r\n\r\n// 3. Prove the delay actually happened (delay param works)\r\npm.test(\"Response was delayed as requested\", () => {\r\n    pm.expect(pm.response.responseTime).to.be.above(2000);\r\n});\r\n\r\n// 4. Data integrity — delay must not corrupt the payload\r\nconst json = pm.response.json();\r\npm.test(\"Response structure is intact despite delay\", () => {\r\n    pm.expect(json).to.include.all.keys(\"page\", \"per_page\", \"total\", \"total_pages\", \"data\");\r\n    pm.expect(json.data).to.be.an(\"array\").that.is.not.empty;\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://reqres.in/api/users?delay=2",
+          "protocol": "https",
+          "host": [
+            "reqres",
+            "in"
+          ],
+          "path": [
+            "api",
+            "users"
+          ],
+          "query": [
+            {
+              "key": "delay",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "userId",
+      "value": ""
+    }
+  ]
+}
